@@ -1,0 +1,22 @@
+=== STDOUT ===
+USING RUNNER: behave.runner:Runner
+Feature: Google Search # bdd_tests/features/search.feature:1
+
+  Scenario: Search keyword on the first page             # bdd_tests/features/search.feature:3
+    Given I launch the browser and search for URL        # bdd_tests/features/steps/search_steps.py:14
+[INFO] Opening URL: https://memoressa.media/
+    Then I should see results on the page                # bdd_tests/features/steps/search_steps.py:38
+ Screenshot saved: bdd_tests/screenshots\results_page.png
+Found 12 results.
+    Then I save the responsiveness screenshots           # bdd_tests/features/steps/search_steps.py:52
+ Screenshot for mobile saved at: bdd_tests/screenshots/responsiveness\mobile_20251005_181057.png
+ Screenshot for tablet saved at: bdd_tests/screenshots/responsiveness\tablet_20251005_181059.png
+ Screenshot for desktop saved at: bdd_tests/screenshots/responsiveness\desktop_20251005_181100.png
+    Then I verify SSL certificate is available and valid # bdd_tests/features/steps/search_steps.py:60
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 0 skipped
+4 steps passed, 0 failed, 0 skipped
+Took 0min 18.809s
+
+=== STDERR ===

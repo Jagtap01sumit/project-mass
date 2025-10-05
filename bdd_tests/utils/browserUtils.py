@@ -1,48 +1,54 @@
-from playwright.sync_api import sync_playwright
+# bdd_tests/pageObjects/my_class_order_page.py
+
+from bdd_tests.features.steps.BaseClass import BasePageObject
+from playwright.async_api import Page
 import os
 from datetime import datetime
 
-class Browser:
-    _playwright = None
-    _browser = None
-    _context = None
-    _page = None
+class Browser(BasePageObject):
+    RESPONSIVE_VIEWS = {
+    "mobile": {"width": 375, "height": 667},
+    "tablet": {"width": 768, "height": 1024},
+    "desktop": {"width": 1366, "height": 768}
+}
+    def __init__(self, page: Page, context_object):
+        super().__init__(page)
+        self.context_object = context_object
 
-    @staticmethod
-    def start_browser(headless=False):
-        """Start a new browser and return the page."""
-        if Browser._playwright is None:
-            Browser._playwright = sync_playwright().start()
-            Browser._browser = Browser._playwright.chromium.launch(headless=headless)
-            Browser._context = Browser._browser.new_context()
-            Browser._page = Browser._context.new_page()
-        return Browser._page
+        # Element locators
+        self.searchbar_xpath = "//div[text()='search']"
 
-    @staticmethod
-    def close_browser():
-        """Close browser and stop Playwright."""
-        if Browser._browser:
-            Browser._browser.close()
-        if Browser._playwright:
-            Browser._playwright.stop()
-        Browser._playwright = Browser._browser = Browser._context = Browser._page = None
+    async def enter_search(self, text):
+        await self.page.fill(self.searchbar_xpath, text)
 
+    async def click_search(self):
+        await self.page.click(self.searchbar_xpath)
     @staticmethod
-    async def take_screenshot(name=None, folder="screenshots"):
+    async def take_screenshot(page: Page = None, name: str = "screenshot.png", folder: str = "bdd_tests/screenshots"):
         """Take a screenshot of the current page."""
-        if Browser._page is None:
-            raise Exception("Browser is not started. Call start_browser() first.")
 
-       # crate folder is not exists
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+        # Use page if provided, otherwise fallback to Browser._page
+        page = page or Browser._page
+        if page is None:
+            raise Exception(" No Playwright page instance available for screenshot.")
 
-        # create file 
-        if not name:
+        # Ensure the folder exists
+        os.makedirs(folder, exist_ok=True)
+
+        # Auto-generate name if not provided
+        if not name or name.strip() == "":
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             name = f"screenshot_{timestamp}.png"
 
+        # Ensure it ends with .png
+        if not name.endswith(".png"):
+            name += ".png"
+
         path = os.path.join(folder, name)
-        await Browser._page.screenshot({ path: name });
-        print(f"📸 Screenshot saved: {path}")
+
+        # Take screenshot
+        await page.screenshot(path=path)
+        print(f" Screenshot saved: {path}")
         return path
+    
+    
